@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-class weathertile extends StatelessWidget {
+class WeatherTile extends StatelessWidget {
   IconData icon;
   String title;
   String subtitle;
   
-  weathertile(
-  {required this.icon,required this.title,required this.subtitle}
+  WeatherTile(
+  {required this.icon,required this.title,required this.subtitle,}
 );
   
   @override

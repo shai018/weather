@@ -18,7 +18,8 @@ class widget extends StatelessWidget {
       required this.tempMin,
       required this.humidity,
       required this.windSpeed,
-      required this.weather});
+      required this.weather
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +49,7 @@ class widget extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "High of ${tempMax.toInt().toString()}°C of ${tempMin.toInt().toString()}°C",
+                  "High of ${tempMax.toInt()}°C of ${tempMin.toInt()}°C",
                   style: TextStyle(
                     color: Color(0xff9e9e9e),
                     fontSize: 14,
@@ -60,18 +61,18 @@ class widget extends StatelessWidget {
           ),
           Expanded(child: Padding(padding:EdgeInsets.all(12) ,
             child: ListView(children: [
-              weathertile(icon: Icons.thermostat_auto_outlined,
+              WeatherTile(icon: Icons.thermostat_auto_outlined,
                   title: "Temperature",
                   subtitle: "${temp.toInt().toString()}°C "),
-              weathertile(icon: Icons.filter_drama_outlined,
+              WeatherTile(icon: Icons.filter_drama_outlined,
                   title: "weather",
-                  subtitle: "${temp.toInt().toString()}",),
-              weathertile(icon: Icons.wb_sunny,
+                  subtitle: "${weather.toString()}",),
+              WeatherTile(icon: Icons.wb_sunny,
                   title: "Humidity",
                   subtitle: "${humidity.toString()}%"),
-              weathertile(icon: Icons.waves_outlined,
+              WeatherTile(icon: Icons.waves_outlined,
                   title: "wind speed",
-                  subtitle: "${windSpeed.toInt().toString()}°C "),
+                  subtitle: "${windSpeed.toString()} kmph "),
             ],),
           ))
         ],
@@ -79,3 +80,4 @@ class widget extends StatelessWidget {
     );
   }
 }
+

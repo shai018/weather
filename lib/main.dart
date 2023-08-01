@@ -1,12 +1,16 @@
+import 'dart:developer';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:weather_1/GetLocation.dart';
+import 'package:weather_1/widget/weathertile.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'widget/widget.dart';
 
 void main() {
+
   runApp(
       MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -14,14 +18,24 @@ void main() {
         home: MyApp(),
       ),
   );
+  getlocation();
 }
 
-Future<Weatherinfo> fetchWeather() async{
-  final ZipCodec = "600126";
+Future<Weatherinfo> fetchWeather() async {
+
   final apikey = "b68d0f5586304d1e3c2889427a24647e";
-  final requestUrl ="https://api.openweathermap.org/data/2.5/weather?zip=600126,in&unit=metric&appid=b68d0f5586304d1e3c2889427a24647e";
+  Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  // log(position.longitude.toString());
+  // log(position.latitude.toString());
+  // final requestUrlTest ="https://api.openweathermap.org/data/2.5/weather?lat=${position.latitude}&lon=${position.longitude}&unit=metric&appid=b68d0f5586304d1e3c2889427a24647e";
+  // final responseTest = await http.get(Uri.parse(requestUrlTest));
+  // log("Test");
+  // log(responseTest.body);
+  // log("Tested");
+  // final requestUrl ="https://api.openweathermap.org/data/2.5/weather?zip=600126,in&unit=metric&appid=b68d0f5586304d1e3c2889427a24647e";
+  final requestUrl ="https://api.openweathermap.org/data/2.5/weather?lat=${position.latitude}&lon=${position.longitude}&unit=metric&appid=b68d0f5586304d1e3c2889427a24647e";
   final response = await http.get(Uri.parse(requestUrl));
-  
+  log(response.body);
   if(response.statusCode==200)
   {
     return Weatherinfo.fromJSON(jsonDecode(response.body));
@@ -56,16 +70,12 @@ class Weatherinfo{
   factory Weatherinfo.fromJSON(Map<String,dynamic>json){
     return Weatherinfo(
         location: json['name'],
-        temp: json['main']['temp'],
-        tempMin: json['main']['tempMin'],
-        tempMax: json['main']['tempmax'],
-        weather: json['main'][0]['description'],
+        temp: json['main']['temp'] - 273.15 ,
+        tempMin: json['main']['temp_min']-273.15,
+        tempMax: json['main']['temp_max']-273.15,
+        weather: json['weather'][0]['description'],
         humidity: json['main']['humidity'],
         windSpeed: json['wind']['speed']
-
-
-
-
     );
   }
 
@@ -85,30 +95,40 @@ class _MyAppState extends State<MyApp> {
   late Future<Weatherinfo> futureWeather;
   @override
   void initState(){
+    futureWeather = call();
     super.initState();
-    futureWeather = fetchWeather();
+
   }
+  Future<Weatherinfo> call() async{
+    return await fetchWeather();
+  }
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
-      body: FutureBuilder<Weatherinfo>(
+      appBar: AppBar(
+        title: const Text('Weather App'),
+        backgroundColor: Colors.amber,
+      ),
+      body: FutureBuilder(
         future: futureWeather,
-        builder:(context,snapshot){
+        builder:(BuildContext context, AsyncSnapshot snapshot){
           if(snapshot.hasData){
             return widget(
-              location: snapshot.data?.location,
-              temp: snapshot.data?.temp,
-              tempMin: snapshot.data?.tempMin,
-              tempMax: snapshot.data?.tempMax,
-              weather: snapshot.data?.weather,
-              humidity: snapshot.data?.humidity,
-              windSpeed: snapshot.data?.windSpeed,
+              location: snapshot.data.location,
+              temp: snapshot.data.temp,
+              tempMin: snapshot.data.tempMin,
+              tempMax: snapshot.data.tempMax,
+              weather: snapshot.data.weather,
+              humidity: snapshot.data.humidity,
+              windSpeed: snapshot.data.windSpeed,
             );
           }
           else {
             if(snapshot.hasError){
              return Center(
-               child: Text("$snapshot.error"),
+               child: Text("error"),
              );
           }
           }
@@ -116,10 +136,8 @@ class _MyAppState extends State<MyApp> {
         }
 
       ),
-      appBar: AppBar(
-        title: const Text('Weather App'),
-      ),
 
+      // body: Container(
       );
 
   }
